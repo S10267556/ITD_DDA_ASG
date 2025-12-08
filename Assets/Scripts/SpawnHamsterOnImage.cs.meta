@@ -1,0 +1,13 @@
+fileFormatVersion: 2
+guid: 1b3910c0268b95d49aa5f48138596821
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - trackedImageManager: {instanceID: 0}
+  - hamsterPrefab: {fileID: 1970156788056620324, guid: 804775b90f147ca48b4d02663c2d31ec, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
