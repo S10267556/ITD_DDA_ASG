@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "236160870971",
+    "firebase_url": "https://dda-2025-3e900-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "dda-2025-3e900",
+    "storage_bucket": "dda-2025-3e900.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:236160870971:android:b106e13302a70360548a1e",
+        "android_client_info": {
+          "package_name": "sg.edu.np.s10267556"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCgd746n24axX_MEAA7MpJlBDqNgSybwOg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -209,7 +209,8 @@ namespace UnityEngine.XR.Interaction.Toolkit.Samples.StarterAssets
             if (m_SpawnAsChildren)
                 newObject.transform.parent = transform;
 
-            newObject.transform.position = spawnPoint;
+            // Offset upward so the object doesn't sink into the ground
+            newObject.transform.position = spawnPoint + Vector3.up * 0.5f;
             EnsureFacingCamera();
 
             var facePosition = m_CameraToFace.transform.position;
