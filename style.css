@@ -1,0 +1,201 @@
+body{ /* Centers everything + adds a bg colour + Changes font to something easily readable */
+    font-family: Arial, sans-serif;
+    background-color: #ffe1da;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+} 
+
+
+.nav-container{ /* Splits the nav bar into 2, one for leaderboard and one for profile, adds an outline to more easily diffrenciate the nav bar from main body */
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    background-color: #ff8378;
+    outline-width: 1vw;
+    outline-color: #a92b22;
+    outline-style: solid;
+}
+
+
+#leaderboard-Container, #profile-container{ /* make sure icons stay in the middle of their container */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 50%;
+}
+
+#leaderboard-icon{ /* sizes the leaderboard icon */
+    width: 3vw;
+    height: auto;
+    padding: 1vw;
+}
+
+#profile-icon{ /* sizes the profile icon */
+    width: 3vw;
+    height: auto;
+    padding: 1vw;
+}
+
+h1{ /* adds colour and padding for headers */
+    color: #851a12;
+    padding: 5vw;
+}
+
+#leaderboard-list{ /* makes sure the leaderboard can be easily seen from the background + the size */
+    width: 70vw;
+    margin: auto;
+    background-color: #a92b22;
+    padding: 2vw;
+    text-align: left;
+}
+
+#top-10-header{ /* spaces out the header elements and makes them stand out from bg */
+    display: flex;
+    justify-content: space-between;
+    color: #ffe1da;
+    border-bottom: 2px solid #ffe1da;
+}
+
+#header-name, .player-entry-user{ /* aligns the name column */
+    width: 50%;
+    text-align: left;
+}
+
+#header-days, .player-entry-days{ /* aligns the days column */
+    width: 20%;
+    text-align: left;
+}
+
+#header-score, .player-entry-score{ /* aligns the score column */
+    width: 30%;
+    text-align: right;
+}
+
+.player-entry{ /* div that holds each player entry, adds a border to separate entries */
+    display: flex;
+    justify-content: space-between;
+    color: #ffe1da;
+    border-bottom: 1px solid #ffe1da;
+}
+
+#sign-container{ /* centers the sign in and sign up forms */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#sign-form{ /* styles the sign in form */
+    display: flex;
+    flex-direction: column;
+    width: 20vw;
+    background-color: #801b14;
+    padding: 2vw;
+    border-radius: 1vw;
+}
+
+#sign-up-form{ /* styles the sign up form */
+    display: flex;
+    flex-direction: column;
+    width: 20vw;
+    background-color: #9c2a22;
+    padding: 2vw;
+    border-radius: 1vw;
+}
+
+.sign-inputs{ /* styles the input fields */
+    color: #ffe1da;
+    align-self: start;
+    font-weight: bold;
+}
+
+#main-button{ /* styles the main buttons */
+    margin-top: 1vw;
+    padding: 0.5vw;
+    background-color: #ff8378;
+    border: none;
+    border-radius: 0.8vw;
+    color: #851a12;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#submit:hover{ /* hover effect for main buttons */
+    background-color: #69150f;
+    color: #d0aba3;
+}
+
+#sign-title{ /* styles the sign in and sign up titles */
+    padding-top: 12vw;
+    padding-bottom: 2vw;
+}
+
+#second-button{ /* styles the secondary buttons */
+    background-color: #d5624e;
+    border: none;
+    border-radius: 0.8vw;
+    color: #600e09;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#second-button-bg{ /* adds background and padding to secondary buttons */
+    margin-top: 1vw;
+    padding: 0.3vw;
+    background-color: #d5624e;
+    border: none;
+    border-radius: 0.8vw;
+    color: #600e09;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#error-message{ /* styles the error messages */
+    color: #ffe3e3;
+    font-weight: bold;
+    height: 1.5vw;
+}
+
+#log-out-button{ /* styles the log out button to make it stand out and noticable */
+    background-color: #d5624e;
+    border: none;
+    border-radius: 0.8vw;
+    color: #600e09;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 0.5vw;
+    margin: 5vw;
+    width: 10vw;
+    height: auto;
+    font-size: larger;
+}
+
+#profile-items-container{ /* styles the profile items container */
+    background-color: #a92b22;
+    padding: 2vw;
+    width: 80%;
+    margin: auto;
+}
+
+.profile-titles{ /* styles the profile titles */
+    color: #ffe1da;
+    font-weight: bold;
+    align-self: start;
+}
+
+.user-profile-titles{ /* bolds and aligns the user profile titles */
+    color: #ffe1da;
+    font-weight: bold;
+    align-self: flex-end;
+}
+
+#username-display, #pet-name-display, #days-display, #score-display{ /* makes sure the profile items are spaced out with separators */
+    display: flex;
+    justify-content: space-between;
+    margin: 2vw;
+    border-bottom: 0.2vw solid #e8a89a;
+}
+
+#username-display p, #pet-name-display p, #days-display p, #score-display p{ /* makes the profile texts a suitable size */
+    font-size: 1.1rem;
+}

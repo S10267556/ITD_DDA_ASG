@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="style.css"> <!-- Links the CSS file -->
+        <title>Profile</title>
+    </head>
+    <body>
+        <header>
+            <nav class = "nav-container">
+                <div id="leaderboard-Container">
+                <a href="leaderboard.html"><img id="leaderboard-icon" src="images/leaderboardPNG.png" alt="Leaderboard Icon"></a> <!-- adds the leaderboard icon with link to leaderboard page -->
+                </div>  
+                <div id="profile-container" style="background-color: #df4d4d; padding: 1vw; outline-width: 1vw; outline-color: #a92b22; outline-style: solid;"> <!--colour is changed depending on selection of page -->
+                <img id="profile-icon" src="images/profilePNG.png" alt="Profile Icon">
+                </div>
+            </nav>
+        </header>
+            
+        <h1 id="profile-title">Profile</h1>
+
+        <div id="profile-items-container">
+            <div id="username-display">
+                <p class="profile-titles">Username: </p>
+            </div>
+
+            <div id="pet-name-display">
+                <p class="profile-titles">Pet Name: </p>
+            </div>
+
+            <div id="days-display">
+                <p class="profile-titles">Days: </p>
+            </div>
+
+            <div id="score-display">
+                <p class="profile-titles">Score: </p>
+            </div>
+        </div>
+
+        <button type="log-out" id="log-out-button">Log Out</button> <!-- Log out button -->
+
+        <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+        import { getDatabase, ref, child, get, set, onChildChanged, query, orderByChild, limitToFirst, limitToLast} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
+        import { getAuth, signOut, onAuthStateChanged}from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+        import { firebaseConfig } from "./firebaseConfig.js";
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig); //initializes firebase app to be used in code
+        const db = getDatabase(app);
+        const players = ref(db, "players");
+        const auth = getAuth(); //auth to retrieve user data
+
+        let usernameDisplay = document.getElementById("username-display"); //get all the display divs to add user data to
+        let daysDisplay = document.getElementById("days-display");
+        let scoreDisplay = document.getElementById("score-display");
+        let petNameDisplay = document.getElementById("pet-name-display");
+
+        let errorMessageDiv = document.getElementById("profile-items-container"); //div to display error messages in
+
+        document.getElementById("log-out-button") //logs out and brings user back to sign-in page
+        .addEventListener("click", () => {
+            signOut(auth).then(() => {
+            window.location.href = "sign-in.html";
+            });
+        });
+
+        onAuthStateChanged(auth, (user) => { //checks if user is logged in
+            if (!user) { //if not user is logged in, bring to sign-in page
+                window.location.href = "sign-in.html";
+                return;
+            }
+
+            // User is logged in - load profile
+            get(ref(db, "players/" + user.uid))
+                .then((snapshot) => {
+                    if (snapshot.exists()) { //if user data exists, add info to profile page
+                        const userData = snapshot.val();
+                        usernameDisplay.innerHTML += '<p class="user-profile-titles">' + userData.username + '</p>';
+                        petNameDisplay.innerHTML += '<p class="user-profile-titles">' + userData.petName + '</p>';
+                        daysDisplay.innerHTML += '<p class="user-profile-titles">' + userData.days + '</p>';
+                        scoreDisplay.innerHTML += '<p class="user-profile-titles">' + userData.score + '</p>';
+                    } else {
+                        errorMessageDiv.innerHTML = "<p>User data not found.</p>"; //display message if no data found
+                    }
+                })
+                .catch((error) => {
+                    console.error(error);
+                    errorMessageDiv.innerHTML = "<p>Error retrieving user data.</p>"; //display error message if error occurs
+                });
+        });
+        
+    </script>
+    </body>
+</html>

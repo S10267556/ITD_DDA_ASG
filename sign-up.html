@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="style.css"> <!-- Links the CSS file -->
+        <title>Sign Up</title>
+    </head>
+
+    <body id="sign-body"> 
+        <h1 id="sign-title">Sign up</h1>
+        <div id="sign-container">
+                <form id ="sign-up-form">
+                    <label for="Email" class="sign-inputs">Email:</label> <!--input box for email -->
+                    <input type="email" name="Email"
+                    id="Email" required
+                    placeholder="Enter email">
+                    <br>
+                    <label for="Username" class="sign-inputs">Username:</label> <!--input box for username -->
+                    <input type="text" name="Username"
+                    id="Username" required
+                    placeholder="Enter username">
+                    <br>
+                    <label for="Password" class="sign-inputs">Password:</label> <!--input box for password -->
+                    <input type="password" name="Password"
+                    id="Password" required placeholder="Enter password">
+                    <br>
+                    <button type="submit" id="main-button">Sign Up</button> <!-- Sign up button -->
+                    <a href="sign-in.html" id="second-button-bg"><button type="button" id="second-button">Sign In</button></a> <!-- Link to sign in page, sign in button -->
+                    <br>
+                    <p id="error-message"></p>
+                </form>
+        </div>
+
+        <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+        import { getDatabase, ref, child, get, set, onChildChanged, query, orderByChild, limitToFirst, limitToLast} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
+        import { getAuth, createUserWithEmailAndPassword }from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+        import { firebaseConfig } from "./firebaseConfig.js";
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const players = ref(db, "players");
+
+        let errorMessageText = document.getElementById("error-message"); //get the error message paragraph to display error messages in
+        
+        const auth = getAuth();
+
+        document
+            .getElementById("sign-up-form")
+            .addEventListener("submit", signUp); //attach the signUp function to the form submit event
+
+        function signUp(e){
+
+            e.preventDefault(); //prevents page from refeshing When form is submitted
+ 
+            const email = document.getElementById("Email").value; //get email, password and username values from what the user entered
+            const password = document.getElementById("Password").value;
+            const username = document.getElementById("Username").value;
+
+            createUserWithEmailAndPassword(auth, email, password) //sign up function from firebase auth
+                .then((userCredential) => {
+                    // Signed up 
+                    const user = userCredential.user;
+
+                    // Save extra user data
+                return set(ref(db, "players/" + user.uid), { //adds user data to database with their user id as key, since they are signing up it means that they do not have a preexisting account - so days and score are set to 0, pet name is set to default "hamster"
+                    username: username,
+                    email: email,
+                    days: 0,
+                    score: 0,
+                    petName: "hamster"
+
+                });
+                })
+                  .then(() => { //move to sign in after successful sign up
+                    window.location.href = "sign-in.html";
+                })
+                
+                
+                .catch((error) => {
+                    const errorCode = error.code; //error messages for sign up issues
+                    const errorMessage = error.message;
+                    if (errorCode === "auth/email-already-in-use") {
+                        errorMessageText.textContent = "This email is already registered.";
+                    }
+                    if (errorCode === "auth/invalid-email") {
+                        errorMessageText.textContent = "The email address is not valid.";
+                    }
+                    if (errorCode === "auth/weak-password") {
+                        errorMessageText.textContent = "The password is too weak. Please choose a stronger password.";
+                    }
+                    else {
+                        errorMessageText.textContent = error.message;
+                    }
+                });
+        }
+        
+        </script>
+    </body>
+</html>

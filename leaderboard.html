@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="style.css"> <!-- Links the CSS file -->
+        <title>Leaderboard</title> <!-- Title of the webpage  -->
+    </head>
+
+    <body>
+        <header>
+            <nav class = "nav-container">
+                <div id="leaderboard-Container" style="background-color: #df4d4d; padding: 1vw; outline-width: 1vw; outline-color: #a92b22; outline-style: solid;"> <!--colour is changed depending on selection of page -->
+                <img id="leaderboard-icon" src="images/leaderboardPNG.png" alt="Leaderboard Icon"> <!-- adds the leaderboard icon -->
+                </div>  
+                <div id="profile-container">
+                <a href="profile.html"><img id="profile-icon" src="images/profilePNG.png" alt="Profile Icon"></a> <!-- adds the profile icon with link to profile page -->
+                </div>
+            </nav>
+        </header>
+
+        <h1>Leaderboard</h1>
+
+        <div id="leaderboard-list">
+            
+            <div id="top-10-header">
+                <h2 id="header-name">Username</h2>
+                <h3 id="header-days">Days</h3>
+                <h3 id="header-score">Score</h3>
+            </div>                
+            
+            <!-- Top players Added through script -->  
+        </div>
+        
+        <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+        import { getDatabase, ref, child, get, set, onChildChanged, query, orderByChild, limitToFirst, limitToLast} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
+        import { firebaseConfig } from "./firebaseConfig.js";
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig); //initializes firebase app to be used in code
+        const db = getDatabase(app);
+        const players = ref(db, "players");
+
+        let playerNamesDiv = document.getElementById("leaderboard-list"); //get the leaderboard list div to add player entries to
+
+        const topPlayers = query( //query to get the top 10 players
+            ref(db, 'players'),
+            orderByChild('score'),
+            limitToLast(10)
+        );
+        
+        // Function to get player data from database and fill leaderboard
+        function getPlayerData() { //function to call to get player data
+            get(topPlayers).then((snapshot) => {
+                if (snapshot.exists()) {
+                    try {
+                        let topPlayersArray = []; //array to hold top players
+
+                        snapshot.forEach((player) => {
+                            topPlayersArray.push(player.val()) //add each player to the array
+                        });
+                
+                        topPlayersArray.reverse(); //reverse the array to have highest score first
+
+                        topPlayersArray.forEach((player) => {
+                            console.log(player.username); 
+                            playerNamesDiv.innerHTML += `<div class="player-entry"><p class="player-entry-user">${player.username}</p> <p class="player-entry-days">${player.days}</p> <p class="player-entry-score">${player.score}</p></div>`; //add each player to the leaderboard list div with ids to be styled later
+                        });
+                               
+                        }   catch(error) {
+                                playerNamesDiv.innerHTML = `<p>Error retrieving player data.</p>`; //display error message if error occurs
+                            }
+                        }
+                        if (!snapshot.exists()) {
+                            playerNamesDiv.innerHTML = `<p>No player data found.</p>`; //display message if no data found
+                            return;
+                        }
+                    });
+        }
+
+        getPlayerData(); //call function to fill leaderboard
+    </script>
+
+    </body>
+
+
+    
+
+</html>
