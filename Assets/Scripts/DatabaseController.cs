@@ -13,11 +13,21 @@ using UnityEngine.EventSystems;
 public class DatabaseController : MonoBehaviour
 {
     private Player newPlayer;
+
+    private DatabaseReference db;
+    
     public GameObject targetObject;  // The target transform for the Hamster to look at
     public GameObject HamsterObject;  // The Hamster GameObject
-    private DatabaseReference db;
+    
+
     public TMP_Text usernameDisplayText;
     public TMP_InputField newNameInputField;
+
+    [SerializeField]
+    private AudioClip toxicFoodSound; 
+    [SerializeField]
+    private AudioClip FoodSound; 
+
     private int coins = 0;
 
     [SerializeField]
@@ -30,12 +40,37 @@ public class DatabaseController : MonoBehaviour
     [SerializeField]
     private float timePassed = 0f;
 
-    [SerializeField]
-    private int eFoodSunflowerSeeds = 1;
-    private int eFoodStrawberries = 2;
-
     private bool foodPlaced = false;
-    
+
+    //all food serializable fields
+    [SerializeField]
+    private TMP_Text almondAmtText;
+    private int almondAmt = 0;
+
+    [SerializeField]
+    private TMP_Text broccoliAmtText;
+    private int broccoliAmt = 0;
+
+    [SerializeField]
+    private TMP_Text caffeineAmtText;
+    private int caffeineAmt = 0;
+
+    [SerializeField]
+    private TMP_Text carrotAmtText;
+    private int carrotAmt = 0;
+
+    [SerializeField]
+    private TMP_Text onionAmtText;
+    private int onionAmt = 0;
+
+    [SerializeField]
+    private TMP_Text strawberryAmtText;
+    private int strawberryAmt = 0;
+
+    [SerializeField]
+    private TMP_Text sunflowerSeedsAmtText;
+    private int sunflowerSeedsAmt = 0;
+
 
     [SerializeField]
     private float idleTime = 30f; //amt of time player is allowed to idle before pet starts losing energy
@@ -95,5 +130,42 @@ public class DatabaseController : MonoBehaviour
         {
             HamsterObject = other.gameObject;
         }
+    }
+
+    void eatFood()
+    {
+        
+    }
+
+    void buyFood()
+    {
+        string uid = FirebaseAuth.DefaultInstance.CurrentUser.UserId;
+        var db = FirebaseDatabase.DefaultInstance.RootReference;
+        var playerRetrieveTask = db.Child("players").Child(uid).GetValueAsync();
+        playerRetrieveTask.ContinueWithOnMainThread(task =>
+        {
+            if (task.IsFaulted || task.IsCanceled)
+            {
+                Debug.Log("Error loading player!!!");
+                return;
+            }
+
+            if (task.IsCompleted)
+            {
+                string json = task.Result.GetRawJsonValue();
+                Debug.Log("Player loaded successfully!");
+
+                Player player = JsonUtility.FromJson<Player>(json);
+
+                //if()
+
+                //usernameDisplayText.text = player.name;
+                //itemsInInventory = player.items.Count;
+                //numberOfItemsText.text = "(" + itemsInInventory.ToString() + "/4)";
+
+                
+
+            }
+        });
     }
 }

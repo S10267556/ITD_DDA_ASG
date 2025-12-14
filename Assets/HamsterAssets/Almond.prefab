@@ -72,6 +72,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Almond
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 0789bdefdd721c04683a813bf0288f1d, type: 3}
+      propertyPath: m_TagString
+      value: ToxicFood
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
