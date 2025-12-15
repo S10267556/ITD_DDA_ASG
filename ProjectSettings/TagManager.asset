@@ -9,6 +9,13 @@ TagManager:
   - Info
   - ToxicFood
   - SafeFood
+  - Almond
+  - Broccoli
+  - Caffeine
+  - Carrot
+  - Onion
+  - Strawberry
+  - SunflowerSeeds
   layers:
   - Default
   - TransparentFX

@@ -24,8 +24,8 @@ public class TouchTest : MonoBehaviour
 
             if (Physics.Raycast(ray, out hit, 100))
             {
-                Debug.Log("hit");
-                Debug.Log(hit.transform.name + ":" + hit.transform.tag);
+                //Debug.Log("hit");
+                //Debug.Log(hit.transform.name + ":" + hit.transform.tag);
 
                 if (hit.transform.tag == "Hamster")
                 {

@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using Firebase.Database;
 using UnityEngine.XR.Interaction.Toolkit.Utilities;
+
 
 namespace UnityEngine.XR.Interaction.Toolkit.Samples.StarterAssets
 {
@@ -9,6 +11,7 @@ namespace UnityEngine.XR.Interaction.Toolkit.Samples.StarterAssets
     /// </summary>
     public class ObjectSpawner : MonoBehaviour
     {
+
         [SerializeField]
         [Tooltip("The camera that objects will face when spawned. If not set, defaults to the main camera.")]
         Camera m_CameraToFace;
@@ -190,7 +193,7 @@ namespace UnityEngine.XR.Interaction.Toolkit.Samples.StarterAssets
         /// Otherwise, it will spawn the prefab at the index.
         /// </remarks>
         /// <seealso cref="objectSpawned"/>
-        public bool TrySpawnObject(Vector3 spawnPoint, Vector3 spawnNormal)
+        public GameObject TrySpawnObject(Vector3 spawnPoint, Vector3 spawnNormal)
         {
             if (m_OnlySpawnInView)
             {
@@ -200,7 +203,7 @@ namespace UnityEngine.XR.Interaction.Toolkit.Samples.StarterAssets
                 if (pointInViewportSpace.z < 0f || pointInViewportSpace.x > inViewMax || pointInViewportSpace.x < inViewMin ||
                     pointInViewportSpace.y > inViewMax || pointInViewportSpace.y < inViewMin)
                 {
-                    return false;
+                    return null;
                 }
             }
 
@@ -232,7 +235,7 @@ namespace UnityEngine.XR.Interaction.Toolkit.Samples.StarterAssets
             }
 
             objectSpawned?.Invoke(newObject);
-            return true;
+            return newObject;
         }
     }
 }

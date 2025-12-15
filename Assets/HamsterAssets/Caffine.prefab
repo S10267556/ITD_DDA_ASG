@@ -74,7 +74,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 490dc77b80cad6b4982bbf74b947d36e, type: 3}
       propertyPath: m_TagString
-      value: ToxicFood
+      value: Caffeine
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
