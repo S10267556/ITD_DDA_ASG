@@ -1,60 +1,162 @@
 using UnityEngine;
+using Firebase.Auth;
 using TMPro;
+using Firebase.Extensions;
 
 public class AuthManager : MonoBehaviour
 {
-    [Header("UI References")]
+    [Header("UI Inputs")]
     public TMP_InputField emailInput;
     public TMP_InputField passwordInput;
 
-    public GameObject loginPanel;
-    public GameObject startPanel;
-    public TextMeshProUGUI errorText;
+    [Header("Optional UI Feedback")]
+    public TMP_Text errorText;
 
-    // Called when Login button is pressed
+    private FirebaseAuth auth;
+
+    void Start()
+    {
+        auth = FirebaseAuth.DefaultInstance;
+
+        if (errorText != null)
+        {
+            errorText.text = "";
+        }
+    }
+
+    // login
     public void OnLoginButtonClicked()
     {
         string email = emailInput.text;
         string password = passwordInput.text;
 
-        if (email == "" || password == "")
+        if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
         {
             ShowError("Invalid email or password. Try again.");
             return;
         }
 
-        // TEMP SUCCESS (Firebase later)
-        Debug.Log("Login successful (temporary)");
-        LoginSuccess();
+        auth.SignInWithEmailAndPasswordAsync(email, password)
+            .ContinueWithOnMainThread(task =>
+            {
+                if (task.IsCanceled || task.IsFaulted)
+                {
+                    ShowError("Login failed. Check your details.");
+                    Debug.LogError(task.Exception);
+                    return;
+                }
+
+                FirebaseUser user = task.Result.User;
+                Debug.Log("Login successful: " + user.Email);
+
+                ShowError("");
+            });
     }
 
-    // Called when Sign Up button is pressed
+    // sign up
     public void OnSignUpButtonClicked()
     {
         string email = emailInput.text;
         string password = passwordInput.text;
 
-        if (email == "" || password == "")
+        if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
         {
             ShowError("Invalid email or password. Try again.");
             return;
         }
 
-        // TEMP SUCCESS (Firebase later)
-        Debug.Log("Sign up successful (temporary)");
-        LoginSuccess();
+        if (password.Length < 6)
+        {
+            ShowError("Password must be at least 6 characters.");
+            return;
+        }
+
+        auth.CreateUserWithEmailAndPasswordAsync(email, password)
+            .ContinueWithOnMainThread(task =>
+            {
+                if (task.IsCanceled || task.IsFaulted)
+                {
+                    ShowError("Sign up failed. Try a different email.");
+                    Debug.LogError(task.Exception);
+                    return;
+                }
+
+                FirebaseUser newUser = task.Result.User;
+                Debug.Log("Account created: " + newUser.Email);
+
+                ShowError("");
+            });
     }
 
-    void LoginSuccess()
-    {
-        loginPanel.SetActive(false);
-        startPanel.SetActive(true);
-        errorText.gameObject.SetActive(false);
-    }
-
+    // UI error handling
     void ShowError(string message)
     {
-        errorText.text = message;
-        errorText.gameObject.SetActive(true);
+        if (errorText != null)
+        {
+            errorText.text = message;
+        }
     }
 }
+
+
+// using UnityEngine;
+// using Firebase.Auth;
+// using TMPro;
+// using Firebase.Extensions;
+// using UnityEditor;
+
+// public class FirebaseExample : MonoBehaviour
+// {
+//     public TMP_InputField emailInput;
+//     public TMP_InputField passwordInput;
+
+//     public void SignUp()
+//     {
+//         var createTask = FirebaseAuth.DefaultInstance.CreateUserWithEmailAndPasswordAsync(emailInput.text, passwordInput.text);
+
+//         createTask.ContinueWithOnMainThread(task =>
+//         {
+//             if (task.IsFaulted || task.IsCanceled)
+//             {
+//                 Debug.Log("Error creating user");
+//             }
+
+//             if (task.IsCompleted)
+//             {
+//                 Debug.Log("User created successfully, please sign in");
+
+//                 var uid = task.Result.User.UserId;
+//                 Debug.Log($"Created User UID: {uid}");
+
+//                 var player = new Player(uid, "Name");
+//             }
+//         });
+//     }
+
+//     public void SignIn()
+//     {
+//         var signinTask = FirebaseAuth.DefaultInstance.SignInWithEmailAndPasswordAsync(emailInput.text, passwordInput.text);
+
+//         signinTask.ContinueWithOnMainThread(task =>
+//         {
+//             if (task.IsFaulted || task.IsCanceled)
+//             {
+//                 Debug.Log("Error signing in");
+//                 return;
+//             }
+
+//             if (task.IsCompleted)
+//             {
+//                 Debug.Log("User signed in successfully");
+
+//                 var uid = task.Result.User.UserId;
+//                 Debug.Log($"Signed in user UID: {uid}");
+//             }
+//         });
+//     }
+
+//     void Start()
+//     {
+        
+//     }
+// }
