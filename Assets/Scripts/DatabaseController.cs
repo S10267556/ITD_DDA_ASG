@@ -19,9 +19,11 @@ public class DatabaseController : MonoBehaviour
     public TMP_InputField signUpUsernameInput;
     public TMP_InputField signUpEmailInput;
     public TMP_InputField signUpPasswordInput;
+    public TMP_Text signUpErrorText;
 
     public TMP_InputField signInEmailInput;
     public TMP_InputField signInPasswordInput;
+    public TMP_Text signInErrorText;
 
     public GameObject gameScreen;
     public GameObject foodMenuScreen;
@@ -212,7 +214,25 @@ public class DatabaseController : MonoBehaviour
                 {
                     var exception = task.Exception.GetBaseException() as FirebaseException;
                     var errorCode = (AuthError)exception.ErrorCode;
-                    Debug.Log(errorCode);
+                    
+                    switch (errorCode)
+                    {
+                        case AuthError.MissingEmail:
+                            signUpErrorText.text = "Please enter an email address.";
+                            break;
+                        case AuthError.MissingPassword:
+                            signUpErrorText.text = "Please enter a password.";
+                            break;
+                        case AuthError.InvalidEmail:
+                            signUpErrorText.text = "The email address is not valid.";
+                            break;
+                        case AuthError.EmailAlreadyInUse:
+                            signUpErrorText.text = "The email address is already in use by another account.";
+                            break;
+                        default:
+                            signUpErrorText.text = "Can't sign up user!";
+                            break;
+                    }
                 }
             }
 
@@ -235,7 +255,7 @@ public class DatabaseController : MonoBehaviour
     {
         if (signInEmailInput == null || signInPasswordInput == null)
         {
-            //signInErrorText.text = "Please ensure all fields are filled out!";
+            signInErrorText.text = "Please ensure all fields are filled out!";
             return;
         }
 
@@ -244,7 +264,7 @@ public class DatabaseController : MonoBehaviour
         {
             if (task.IsFaulted)
             {
-                //signInErrorText.text = "Can't sign in user!";
+                signInErrorText.text = "Can't sign in user!";
                 Debug.Log("Can't sign in user!");
                 return;
             }
@@ -436,7 +456,7 @@ public class DatabaseController : MonoBehaviour
                 energy -= 1;
                 affection += caffeineAff;
                 caffeineFed += 1;
-                if(caffeineFed >= 1)
+                if(caffeineFed > 1)
                 {
                     endGame();
                 }
@@ -696,7 +716,7 @@ public class DatabaseController : MonoBehaviour
 
     public void openURL()
     {
-        Application.OpenURL("https://dda-2025-3e900.web.app");
+        Application.OpenURL("https://dda-itd-asg.web.app");
     }
 }
 
