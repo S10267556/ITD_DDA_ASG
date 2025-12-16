@@ -16,6 +16,7 @@ TagManager:
   - Onion
   - Strawberry
   - SunflowerSeeds
+  - Empty
   layers:
   - Default
   - TransparentFX

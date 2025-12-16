@@ -60,7 +60,7 @@ namespace UnityEngine.XR.Interaction.Toolkit.Samples.StarterAssets
         [SerializeField]
         [Tooltip("The index of the prefab to spawn. If outside the range of the list, this behavior will select " +
             "a random object each time it spawns.")]
-        int m_SpawnOptionIndex = -1;
+        int m_SpawnOptionIndex = 7;
 
         /// <summary>
         /// The index of the prefab to spawn. If outside the range of <see cref="objectPrefabs"/>, this behavior will
@@ -176,7 +176,7 @@ namespace UnityEngine.XR.Interaction.Toolkit.Samples.StarterAssets
         /// <seealso cref="isSpawnOptionRandomized"/>
         public void RandomizeSpawnOption()
         {
-            m_SpawnOptionIndex = -1;
+            m_SpawnOptionIndex = 0;
         }
 
         /// <summary>

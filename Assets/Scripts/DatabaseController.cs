@@ -9,6 +9,8 @@ using Firebase.Extensions;
 using System.Data.Common;
 using System;
 using UnityEngine.EventSystems;
+using UnityEngine.XR.Templates.AR;
+using UnityEngine.XR.ARKit;
 
 public class DatabaseController : MonoBehaviour
 {
@@ -22,6 +24,9 @@ public class DatabaseController : MonoBehaviour
     public TMP_InputField signInPasswordInput;
 
     public GameObject gameScreen;
+    public GameObject foodMenuScreen;
+    public GameObject hMenuScreen;
+    public GameObject minigameScreen;
     public GameObject sleepScreen;
     public GameObject endScreen;
     public GameObject signInScreen;
@@ -31,6 +36,8 @@ public class DatabaseController : MonoBehaviour
 
     [SerializeField] 
     private FoodSpawnController foodBehaviour;
+    [SerializeField]
+    private ARTemplateMenuManager aRTemplateMenuManager;
 
     
     public GameObject targetObject;  // The target transform for the Hamster to look at
@@ -72,38 +79,66 @@ public class DatabaseController : MonoBehaviour
 
     [SerializeField]
     private TMP_Text almondAmtText;
+    [SerializeField]
+    private TMP_Text almondCostText;
     public int almondAmt = 0;
     public int almondCost = 3;
+    public int almondAff = 2;
+    [SerializeField]
+    private int almondsFed = 0;
+
 
     [SerializeField]
     private TMP_Text broccoliAmtText;
+    [SerializeField]
+    private TMP_Text broccoliCostText;
     public int broccoliAmt = 0;
     public int broccoliCost = 5;
+    public int broccoliAff = 3;
 
     [SerializeField]
     private TMP_Text caffeineAmtText;
+    [SerializeField]
+    private TMP_Text caffeineCostText;
     public int caffeineAmt = 0;
     public int caffeineCost = 2;
+    public int caffeineAff = 1;
+    [SerializeField]
+    private int caffeineFed = 0;
 
     [SerializeField]
     private TMP_Text carrotAmtText;
+    [SerializeField]
+    private TMP_Text carrotCostText;
     public int carrotAmt = 0;
     public int carrotCost = 4;
+    public int carrotAff = 4;
 
     [SerializeField]
     private TMP_Text onionAmtText;
+    [SerializeField]
+    private TMP_Text onionCostText;
     public int onionAmt = 0;
     public int onionCost = 9;
+    public int onionAff = -10;
+    [SerializeField]
+    private bool givenOnion = false;
 
     [SerializeField]
     private TMP_Text strawberryAmtText;
+    [SerializeField]
+    private TMP_Text strawberryCostText;
     public int strawberryAmt = 0;
     public int strawberryCost = 10;
+    public int strawberryAff = 6;
 
     [SerializeField]
     private TMP_Text sunflowerSeedsAmtText;
+    [SerializeField]
+    private TMP_Text sunflowerSeedsCostText;
     public int sunflowerSeedsAmt = 0;
     public int sunflowerSeedsCost = 8;
+    public int sunflowerSeedsAff = 5;
 
 
     [SerializeField]
@@ -124,16 +159,23 @@ public class DatabaseController : MonoBehaviour
 
     private string quizAns;
 
-    private string bufferedQuestion;
-    private string[] bufferedOptions;
-    private string bufferedAnswer;
-    private bool quizReady = false; //to load quiz once ready - error when trying to load with firebase
+    [SerializeField]
+    private GameObject correctDisplay;
+    [SerializeField]
+    private GameObject WrongDisplay;
+    [SerializeField]
+    private GameObject nextQnButton;
+
+    [SerializeField]
+    private TMP_Text causeOfDeath;
 
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         db = FirebaseDatabase.DefaultInstance.RootReference;
+        foodCosts();
+        db.Child("players").Child(newPlayer.playerID).Child("newGame").SetValueAsync(false);
     }
 
 
@@ -149,18 +191,6 @@ public class DatabaseController : MonoBehaviour
 
         if (HamsterObject != null && targetObject != null && foodPlaced == false){
             HamsterObject.transform.LookAt(targetObject.transform);
-        }
-
-        if (quizReady)
-        {
-            quizQn.text = bufferedQuestion;
-            quizOp1.text = bufferedOptions[0];
-            quizOp2.text = bufferedOptions[1];
-            quizOp3.text = bufferedOptions[2];
-            quizOp4.text = bufferedOptions[3];
-
-            quizAns = bufferedAnswer;
-            quizReady = false;
         }
     }
 
@@ -226,31 +256,47 @@ public class DatabaseController : MonoBehaviour
                 signInScreen.SetActive(false);
                 var uid = task.Result.User.UserId;
                 Debug.Log($"User signed in, user ID is: {uid}");
+                days = newPlayer.days;
+                updateDays();
+                energy = newPlayer.energy;
+                foodAmount();
+                coins = newPlayer.money;
+                updateCoins();
+                affection = newPlayer.score;
+                updateAffection();
             }
         });
     }
 
+    public void foodCosts() //set the amount for all the foods
+    {
+        almondCostText.text = "Buy - $" + almondCost.ToString();
+        broccoliCostText.text = "Buy - $" + broccoliCost.ToString();
+        caffeineCostText.text = "Buy - $" + caffeineCost.ToString();
+        carrotCostText.text = "Buy - $" + carrotCost.ToString();
+        onionCostText.text = "Buy - $" + onionCost.ToString();
+        strawberryCostText.text = "Buy - $" + strawberryCost.ToString();
+        sunflowerSeedsCostText.text = "Buy - $" + sunflowerSeedsCost.ToString();
+    }
 
-
-        public void changeName(TMP_InputField newName)
+    public void changeName(TMP_InputField newName)
     {
         usernameDisplayText.text = newName.text;
         db.Child("players").Child(newPlayer.playerID).Child("name").SetValueAsync(newName.text);
     }
 
-    public void noEnergy()
+    public void noEnergy() 
     {
         //disable all actions that require energy
         gameScreen.SetActive(false);
+        foodMenuScreen.SetActive(false);
+        hMenuScreen.SetActive(false);
+        minigameScreen.SetActive(false);
+        sleepScreen.SetActive(false);
         sleepScreen.SetActive(true);
-        days += 1;
-        if(days == 5)
-        {
-            endGame();
-        }
     }
 
-    public void earnCurrency()
+    public void actionDone()
     {
         timePassed = 0f;
     }
@@ -261,8 +307,12 @@ public class DatabaseController : MonoBehaviour
         if ((UnityEngine.Random.Range(0, 4) == 3) && energy > 0)
         {
             energy -= 1;
-            energyDisplayText.text = "Energy: " + energy.ToString();
+            if (energy == 0)
+            {
+                noEnergy();
+            }
             updateEnergy();
+            actionDone();
         }
     }
 
@@ -272,141 +322,270 @@ public class DatabaseController : MonoBehaviour
         {
             HamsterObject = other.gameObject;
         }
+
+        if (other.gameObject.CompareTag("Empty"))
+        {
+            Destroy(other.gameObject);
+        }
+        if (other.gameObject.CompareTag("Almond") || other.gameObject.CompareTag("Broccoli") || other.gameObject.CompareTag("Caffeine") || other.gameObject.CompareTag("Carrot") || other.gameObject.CompareTag("Onion") || other.gameObject.CompareTag("Strawberry") || other.gameObject.CompareTag("SunflowerSeeds") )
+        {
+            aRTemplateMenuManager.SetObjectToSpawn(0);
+        }
     }
+
+    //done in use food
+    /*public void CheckUserOverlap() 
+    {
+        Collider[] hits = Physics.OverlapSphere(transform.position, userOverlapRadius); //check the area around the user - if there are any colliders with food
+
+        foreach (Collider hit in hits)
+        {
+            if (hit.CompareTag("Almond"))
+            {
+                almondAmt -= 1;
+                energy -= 1;  
+                affection += almondAff;
+            }
+            if (hit.CompareTag("Broccoli"))
+            {
+                broccoliAmt -= 1;
+                energy -= 1;
+                affection += broccoliAff;
+            }
+            if (hit.CompareTag("Caffeine"))
+            {
+                caffeineAmt -= 1;
+                energy -= 1;
+                affection += caffeineAff;
+            }
+            if (hit.CompareTag("Carrot"))
+            {
+                carrotAmt -= 1;
+                energy -= 1;
+                affection += carrotAff;
+            }
+            if (hit.CompareTag("Strawberry"))
+            {
+                strawberryAmt -= 1;
+                energy -= 1;
+                affection += strawberryAff;
+            }
+            if (hit.CompareTag("SunflowerSeeds"))
+            {
+                sunflowerSeedsAmt -= 1;
+                energy -= 1;
+                affection += sunflowerSeedsAff;
+            }
+
+            updateFood();
+            updateEnergy();
+            updateAffection();
+        }
+    }*/
 
     public void foodAmount()
     {
-        string uid = FirebaseAuth.DefaultInstance.CurrentUser.UserId;
-        var db = FirebaseDatabase.DefaultInstance.RootReference;
-        var playerRetrieveTask = db.Child("players").Child(uid).GetValueAsync();
-        playerRetrieveTask.ContinueWithOnMainThread(task =>
-        {
-            if (task.IsFaulted || task.IsCanceled)
-            {
-                Debug.Log("Error loading player!!!");
-                return;
-            }
-
-            if (task.IsCompleted)
-            {
-                string json = task.Result.GetRawJsonValue();
-                Debug.Log("Player loaded successfully!");
-
-                Player player = JsonUtility.FromJson<Player>(json);
-
-                almondAmt = player.food.almonds;
-                almondAmtText.text = "Use (" + almondAmt.ToString() + ")";
-                
-                broccoliAmt = player.food.broccoli;
-                broccoliAmtText.text = "Use (" + broccoliAmt.ToString() + ")";
-
-                caffeineAmt = player.food.caffeine;
-                caffeineAmtText.text = "Use (" + caffeineAmt.ToString() + ")";
-                
-                carrotAmt = player.food.carrots;
-                carrotAmtText.text = "Use (" + carrotAmt.ToString() + ")";
-                
-                onionAmt = player.food.onions;
-                onionAmtText.text = "Use (" + onionAmt.ToString() + ")";
-                
-                strawberryAmt = player.food.strawberries;
-                strawberryAmtText.text = "Use (" + strawberryAmt.ToString() + ")";
-
-                sunflowerSeedsAmt = player.food.sunflowerSeeds;
-                sunflowerSeedsAmtText.text = "Use (" + sunflowerSeedsAmt.ToString() + ")";
-            }
-        });
+        almondAmtText.text = "Use (" + almondAmt.ToString() + ")";
+        broccoliAmtText.text = "Use (" + broccoliAmt.ToString() + ")";
+        caffeineAmtText.text = "Use (" + caffeineAmt.ToString() + ")";
+        carrotAmtText.text = "Use (" + carrotAmt.ToString() + ")";
+        onionAmtText.text = "Use (" + onionAmt.ToString() + ")";
+        strawberryAmtText.text = "Use (" + strawberryAmt.ToString() + ")";
+        sunflowerSeedsAmtText.text = "Use (" + sunflowerSeedsAmt.ToString() + ")";
     }
 
     public void updateFood()
     {
-        if (foodBehaviour.spawnedFood.CompareTag("Almond"))
-        {
-            db.Child("players").Child(newPlayer.playerID).Child("food").Child("almonds").SetValueAsync(almondAmt-1);
-            db.Child("players").Child(newPlayer.playerID).Child("money").SetValueAsync(coins-almondCost);
-            db.Child("players").Child(newPlayer.playerID).Child("score").SetValueAsync(affection+3);
-        }
-        if (foodBehaviour.spawnedFood.CompareTag("Broccoli"))
-        {
-            db.Child("players").Child(newPlayer.playerID).Child("food").Child("broccoli").SetValueAsync(broccoliAmt-1);
-            db.Child("players").Child(newPlayer.playerID).Child("money").SetValueAsync(coins-broccoliCost);
-            db.Child("players").Child(newPlayer.playerID).Child("score").SetValueAsync(affection+3);
-        }
-        if (foodBehaviour.spawnedFood.CompareTag("Caffeine"))
-        {
-            db.Child("players").Child(newPlayer.playerID).Child("food").Child("caffeine").SetValueAsync(caffeineAmt-1);
-            db.Child("players").Child(newPlayer.playerID).Child("money").SetValueAsync(coins-caffeineCost);
-            db.Child("players").Child(newPlayer.playerID).Child("score").SetValueAsync(affection+3);
-        }
-        if (foodBehaviour.spawnedFood.CompareTag("Carrot"))
-        {
-            db.Child("players").Child(newPlayer.playerID).Child("food").Child("carrot").SetValueAsync(carrotAmt-1);
-            db.Child("players").Child(newPlayer.playerID).Child("money").SetValueAsync(coins-carrotCost);
-            db.Child("players").Child(newPlayer.playerID).Child("score").SetValueAsync(affection+3);
-        }
-        if (foodBehaviour.spawnedFood.CompareTag("Onion"))
-        {
-            db.Child("players").Child(newPlayer.playerID).Child("food").Child("onion").SetValueAsync(onionAmt-1);
-            db.Child("players").Child(newPlayer.playerID).Child("money").SetValueAsync(coins-onionCost);
-            db.Child("players").Child(newPlayer.playerID).Child("score").SetValueAsync(affection+3);
-        }
-        if (foodBehaviour.spawnedFood.CompareTag("Strawberry"))
-        {
-            db.Child("players").Child(newPlayer.playerID).Child("food").Child("strawberries").SetValueAsync(strawberryAmt-1);
-            db.Child("players").Child(newPlayer.playerID).Child("money").SetValueAsync(coins-strawberryCost);
-            db.Child("players").Child(newPlayer.playerID).Child("score").SetValueAsync(affection+3);
-        }
-        if (foodBehaviour.spawnedFood.CompareTag("SunflowerSeeds"))
-        {
-            db.Child("players").Child(newPlayer.playerID).Child("food").Child("sunflowerSeeds").SetValueAsync(sunflowerSeedsAmt-1);
-            db.Child("players").Child(newPlayer.playerID).Child("money").SetValueAsync(coins-sunflowerSeedsCost);
-            db.Child("players").Child(newPlayer.playerID).Child("score").SetValueAsync(affection+3);
-        }       
+        db.Child("players").Child(newPlayer.playerID).Child("food").Child("almonds").SetValueAsync(almondAmt);
+        db.Child("players").Child(newPlayer.playerID).Child("food").Child("broccoli").SetValueAsync(broccoliAmt);
+        db.Child("players").Child(newPlayer.playerID).Child("food").Child("caffeine").SetValueAsync(caffeineAmt);
+        db.Child("players").Child(newPlayer.playerID).Child("food").Child("carrots").SetValueAsync(carrotAmt);
+        db.Child("players").Child(newPlayer.playerID).Child("food").Child("onions").SetValueAsync(onionAmt);
+        db.Child("players").Child(newPlayer.playerID).Child("food").Child("strawberries").SetValueAsync(strawberryAmt);
+        db.Child("players").Child(newPlayer.playerID).Child("food").Child("sunflowerSeeds").SetValueAsync(sunflowerSeedsAmt);
+            
+        foodAmount();
     }
 
-    public void eatingFood()
-    {
-        
+    public void useFood(int foodnum)
+    {   
+        if (energy >= 1)
+        {
+            if(foodnum == 1 && almondAmt >= 1)
+            {
+                almondAmt -= 1;
+                energy -= 1;
+                affection += almondAff;
+                almondsFed += 1;
+                if(almondsFed > 1)
+                {
+                    endGame();
+                }
+                aRTemplateMenuManager.SetObjectToSpawn(foodnum);
+            }
+            if(foodnum == 2 && broccoliAmt >= 1)
+            {
+                broccoliAmt -= 1;
+                energy -= 1;
+                affection += broccoliAff;
+                aRTemplateMenuManager.SetObjectToSpawn(foodnum);
+            }
+            if(foodnum == 3 && caffeineAmt >= 1)
+            {
+                caffeineAmt -= 1;
+                energy -= 1;
+                affection += caffeineAff;
+                caffeineFed += 1;
+                if(caffeineFed >= 1)
+                {
+                    endGame();
+                }
+                aRTemplateMenuManager.SetObjectToSpawn(foodnum);
+            }
+            if(foodnum == 4 && carrotAmt >= 1)
+            {
+                carrotAmt -= 1;
+                energy -= 1;
+                affection += carrotAff;
+                aRTemplateMenuManager.SetObjectToSpawn(foodnum);
+            }
+            if(foodnum == 5 && onionAmt >= 1)
+            {
+                onionAmt -= 1;
+                energy -= 1;
+                affection += onionAff;
+                givenOnion = true;
+                endGame();
+                aRTemplateMenuManager.SetObjectToSpawn(foodnum);
+            }
+            if(foodnum == 6 && strawberryAmt >= 1)
+            {
+                strawberryAmt -= 1;
+                energy -= 1;
+                affection += strawberryAff;
+                aRTemplateMenuManager.SetObjectToSpawn(foodnum);
+            }
+            if(foodnum == 7 && sunflowerSeedsAmt >= 1)
+            {
+                sunflowerSeedsAmt -= 1;
+                energy -= 1;
+                affection += sunflowerSeedsAff;
+                aRTemplateMenuManager.SetObjectToSpawn(foodnum);
+            }
+
+            updateFood();
+            updateEnergy();
+            updateAffection();
+            actionDone();
+        }
     }
 
-    public void buyFood()
+    public void buyFood(string foodType)
     {
-        
-    
+        if(foodType == "Almond")
+        {
+            if(coins >= almondCost)
+            {
+                energy -= 1;
+                coins -= almondCost;
+                almondAmt += 1;
+            }
+        }
+
+        if(foodType == "Broccoli")
+        {
+            if(coins >= broccoliCost)
+            {
+                energy -= 1;
+                coins -= broccoliCost;
+                broccoliAmt += 1;
+            }
+        }
+
+        if(foodType == "Caffeine")
+        {
+            if(coins >= caffeineCost)
+            {
+                energy -= 1;
+                coins -= caffeineCost;
+                caffeineAmt += 1;
+            }
+        }
+
+        if(foodType == "Carrot")
+        {
+            if(coins >= carrotCost)
+            {
+                energy -= 1;
+                coins -= carrotCost;
+                carrotAmt += 1;
+            }
+        }
+
+        if(foodType == "Onion")
+        {
+            if(coins >= onionCost)
+            {
+                energy -= 1;
+                coins -= onionCost;
+                onionAmt += 1;
+            }
+        }
+
+        if(foodType == "Strawberry")
+        {
+            if(coins >= strawberryCost)
+            {
+                energy -= 1;
+                coins -= strawberryCost;
+                strawberryAmt += 1;
+            }
+        }
+
+        if(foodType == "SunflowerSeeds")
+        {
+            if(coins >= sunflowerSeedsCost)
+            {
+                energy -= 1;
+                coins -= sunflowerSeedsCost;
+                sunflowerSeedsAmt += 1;
+            }
+        }
+
+        updateCoins();
+        updateFood();
+        updateEnergy();
+        actionDone();
     }
 
     public void quizQuestions()
     {
         var db = FirebaseDatabase.DefaultInstance.RootReference;
+        correctDisplay.SetActive(false);
+        WrongDisplay.SetActive(false);
+        nextQnButton.SetActive(false);
 
         db.Child("QuizList").GetValueAsync().ContinueWithOnMainThread(task =>
-{
-        if (task.IsFaulted || task.IsCanceled)
-            return;
-
-        int questionNum = UnityEngine.Random.Range(0, 5);
-        int index = 0;
-
-        foreach (var child in task.Result.Children)
         {
-            if (index == questionNum)
+            if (task.IsFaulted || task.IsCanceled)
             {
-                bufferedQuestion = child.Child("Question").Value.ToString();
-
-                bufferedOptions = new string[4];
-                int i = 0;
-                foreach (var opt in child.Child("Option").Children)
-                {
-                    bufferedOptions[i++] = opt.Value.ToString();
-                }
-
-                bufferedAnswer = child.Child("Answer").Value.ToString();
-                quizReady = true;
-                break;
+                return;
             }
-            index++;
-        }
-    });
+                
+            var children = new List<DataSnapshot>(task.Result.Children);
+
+            int currentQuestion = UnityEngine.Random.Range(0, children.Count);
+            DataSnapshot selected = children[currentQuestion];
+
+            quizQn.text = selected.Child("Question").Value.ToString();
+
+            quizOp1.text = selected.Child("Options").Child("0").Value.ToString();
+            quizOp2.text = selected.Child("Options").Child("1").Value.ToString();
+            quizOp3.text = selected.Child("Options").Child("2").Value.ToString();
+            quizOp4.text = selected.Child("Options").Child("3").Value.ToString();
+
+            quizAns = selected.Child("Answer").Value.ToString();
+        });
     }
 
     public void checkAnswer(TMP_Text buttonText)
@@ -414,42 +593,110 @@ public class DatabaseController : MonoBehaviour
         if(buttonText.text == quizAns)
         {
             affection += 3;
-            db.Child("players").Child(newPlayer.playerID).Child("score").SetValueAsync(affection);
             coins += 2;
-            db.Child("players").Child(newPlayer.playerID).Child("money").SetValueAsync(coins);
             energy -= 1;
-            quizQuestions();
-            updateEnergy();
+            correctDisplay.SetActive(true);
         }
         else
         {
             affection -= 1;
-            db.Child("players").Child(newPlayer.playerID).Child("score").SetValueAsync(affection);
             energy -= 1;
-            quizQuestions();
-            updateEnergy();
+            WrongDisplay.SetActive(true);
         }
+
+        nextQnButton.SetActive(true);
+        updateEnergy();
+        actionDone();
+        updateCoins();
+        updateAffection();
+    }
+
+    public void nextQn()
+    {
+        quizQuestions();
     }
 
     public void updateAffection()
     {
         affectionDisplayText.text = affection.ToString();
+        db.Child("players").Child(newPlayer.playerID).Child("score").SetValueAsync(affection);
+        if(affection <= -5)
+        {
+            endGame();
+        }
     }
 
     public void updateEnergy()
     {
         energyDisplayText.text = energy.ToString();
+        db.Child("players").Child(newPlayer.playerID).Child("energy").SetValueAsync(energy);
+        if(energy <= 0)
+        {
+            noEnergy();
+        }
     }
 
     public void updateCoins()
     {
         coinsDisplayText.text = coins.ToString();
+        db.Child("players").Child(newPlayer.playerID).Child("money").SetValueAsync(coins);
+    }
+
+    public void updateDays()
+    {
+        daysDisplayText.text = days.ToString();
+        db.Child("players").Child(newPlayer.playerID).Child("days").SetValueAsync(days);
+    }
+
+    public void sleep()
+    {
+        days += 1;
+        energy = 10;
+        affection += 1;
+
+        if(days == 5)
+        {
+            endGame();
+        }
+
+        updateDays();
+        updateEnergy();
+        updateAffection();
+        updateDays();
+        gameScreen.SetActive(true);
+        hMenuScreen.SetActive(true);
+        sleepScreen.SetActive(false);
     }
 
     public void endGame()
     {
         gameScreen.SetActive(false);
         endScreen.SetActive(true);
+        if(almondsFed > 1)
+        {
+           causeOfDeath.text = "One too many Almonds.";
+        }
+        else if (caffeineFed > 1)
+        {
+            causeOfDeath.text = "Coffee? Seriously?";
+        }
+        else if (givenOnion)
+        {
+            causeOfDeath.text = "Onion.";
+        }
+        else if(affection <= -5)
+        {
+            causeOfDeath.text = "Feeling unloved, it ran away.";
+        }
+        else if(days >= 5)
+        {
+            causeOfDeath.text = "Your pet's love for you took it to greater heights!";
+        }
+    }
+
+    public void openURL()
+    {
+        Application.OpenURL("https://dda-2025-3e900.web.app");
     }
 }
 

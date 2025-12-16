@@ -42,29 +42,29 @@ public class FoodSpawnController : MonoBehaviour
             }
 
             // Check if the selected food is available and player has enough coins
-            if (xrSpawner.spawnOptionIndex == 0 && (databaseController.almondAmt <= 0 || databaseController.coins < databaseController.almondCost))
+            if (xrSpawner.spawnOptionIndex == 1 && (databaseController.almondAmt <= 0 || databaseController.coins < databaseController.almondCost))
                 return null;
 
-            if (xrSpawner.spawnOptionIndex == 1 && (databaseController.broccoliAmt <= 0 || databaseController.coins < databaseController.broccoliCost))
+            if (xrSpawner.spawnOptionIndex == 2 && (databaseController.broccoliAmt <= 0 || databaseController.coins < databaseController.broccoliCost))
                 return null;
 
-            if (xrSpawner.spawnOptionIndex == 2 && (databaseController.caffeineAmt <= 0 || databaseController.coins < databaseController.caffeineCost))
+            if (xrSpawner.spawnOptionIndex == 3 && (databaseController.caffeineAmt <= 0 || databaseController.coins < databaseController.caffeineCost))
                 return null;
 
-            if (xrSpawner.spawnOptionIndex == 3 && (databaseController.carrotAmt <= 0 || databaseController.coins < databaseController.carrotCost))
+            if (xrSpawner.spawnOptionIndex == 4 && (databaseController.carrotAmt <= 0 || databaseController.coins < databaseController.carrotCost))
                 return null;
 
-            if (xrSpawner.spawnOptionIndex == 4 && (databaseController.onionAmt <= 0 || databaseController.coins < databaseController.onionCost))
+            if (xrSpawner.spawnOptionIndex == 5 && (databaseController.onionAmt <= 0 || databaseController.coins < databaseController.onionCost))
                 return null;
 
-            if (xrSpawner.spawnOptionIndex == 5 && (databaseController.strawberryAmt <= 0 || databaseController.coins < databaseController.strawberryCost))
+            if (xrSpawner.spawnOptionIndex == 6 && (databaseController.strawberryAmt <= 0 || databaseController.coins < databaseController.strawberryCost))
                 return null;
 
-            if (xrSpawner.spawnOptionIndex == 6 && (databaseController.sunflowerSeedsAmt <= 0 || databaseController.coins < databaseController.sunflowerSeedsCost))
+            if (xrSpawner.spawnOptionIndex == 7 && (databaseController.sunflowerSeedsAmt <= 0 || databaseController.coins < databaseController.sunflowerSeedsCost))
                 return null;
 
             // Prevent invalid selection
-            if (xrSpawner.spawnOptionIndex < 0 || xrSpawner.spawnOptionIndex > 6)
+            if (xrSpawner.spawnOptionIndex < 0 || xrSpawner.spawnOptionIndex > 7)
             {
                 Debug.LogWarning("Invalid spawnOptionIndex!");
                 return null;

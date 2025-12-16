@@ -7,6 +7,8 @@ public class TouchTest : MonoBehaviour
 
     public GameObject hamsterInfoPopup;
 
+    public bool popupSpawned;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -18,7 +20,7 @@ public class TouchTest : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0)) //left click/touch on screen
         {
-            Debug.Log("Screen touched");
+            //Debug.Log("Screen touched");
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
 
@@ -27,17 +29,19 @@ public class TouchTest : MonoBehaviour
                 //Debug.Log("hit");
                 //Debug.Log(hit.transform.name + ":" + hit.transform.tag);
 
-                if (hit.transform.tag == "Hamster")
+                if (hit.transform.tag == "Hamster" && popupSpawned == false)
                 {
                     Vector3 pos = hit.point;
                     pos.y += 0.1f; //raise popup above hamster 
                     pos.z += 0.1f; //move popup forward a bit
-                    Instantiate(hamsterInfoPopup, pos, transform.rotation); 
+                    Instantiate(hamsterInfoPopup, pos, transform.rotation);
+                    popupSpawned = true; 
                 }
 
                 if(hit.transform.tag == "Info")
                 {
                     Destroy(hit.transform.gameObject);
+                    popupSpawned = false;
                 }
             }
         }

@@ -7,11 +7,13 @@ public class Player
 {
     public string playerID;
     public int days;
+    public int energy;
     public string username;
     public int score;
     public string petName;
     public int money;
     public bool newGame;
+    
 
     public Food food;
 
@@ -19,8 +21,9 @@ public class Player
     {
         playerID = id;
         days = 0;
+        energy = 10;
         food = new Food(0, 0, 0, 0, 0, 0, 0);
-        money = 0;
+        money = 10;
         newGame = true;
         petName = "Hamster";
         score = 0;
